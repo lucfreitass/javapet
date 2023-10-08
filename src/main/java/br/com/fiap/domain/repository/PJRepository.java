@@ -1,6 +1,7 @@
 package br.com.fiap.domain.repository;
 
 import br.com.fiap.domain.entity.pessoa.PF;
+import br.com.fiap.domain.entity.pessoa.PJ;
 import br.com.fiap.infra.ConnectionFactory;
 
 import java.sql.*;
@@ -10,29 +11,29 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class PFRepository implements Repository<PF, Long> {
+public class PJRepository implements Repository<PJ, Long> {
 
     private ConnectionFactory factory;
 
-    private static final AtomicReference<PFRepository> instance = new AtomicReference<>();
+    private static final AtomicReference<PJRepository> instance = new AtomicReference<>();
 
-    private PFRepository() {
+    private PJRepository() {
         this.factory = ConnectionFactory.build();
     }
 
-    public static PFRepository build() {
-        instance.compareAndSet(null, new PFRepository());
+    public static PJRepository build() {
+        instance.compareAndSet(null, new PJRepository());
         return instance.get();
     }
 
     @Override
-    public List<PF> findAll() {
-        List<PF> list = new ArrayList<>();
+    public List<PJ> findAll() {
+        List<PJ> list = new ArrayList<>();
         Connection con = factory.getConnection();
         ResultSet rs = null;
         Statement st = null;
         try {
-            String sql = "SELECT * FROM TB_PF";
+            String sql = "SELECT * FROM TB_PJ";
             st = con.createStatement();
             rs = st.executeQuery(sql);
             if (rs.isBeforeFirst()) {
@@ -41,8 +42,8 @@ public class PFRepository implements Repository<PF, Long> {
                     String nome = rs.getString("NM_PESSOA");
                     LocalDate nascimento = rs.getDate("DT_NASCIMENTO").toLocalDate();
                     String tipo = rs.getString("TP_PESSOA");
-                    String cpf = rs.getString("NR_CPF");
-                    list.add(new PF(id, nome, nascimento, cpf));
+                    String cnpj = rs.getString("NR_CNPJ");
+                    list.add(new PJ(id, nome, nascimento, cnpj));
                 }
             }
         } catch (SQLException e) {
@@ -53,11 +54,10 @@ public class PFRepository implements Repository<PF, Long> {
         return list;
     }
 
-
     @Override
-    public PF findById(Long id) {
-        PF pessoa = null;
-        var sql = "SELECT * FROM TB_PF where ID_PESSOA = ?";
+    public PJ findById(Long id) {
+        PJ pessoa = null;
+        var sql = "SELECT * FROM TB_PJ where ID_PESSOA = ?";
         Connection con = factory.getConnection();
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -69,8 +69,8 @@ public class PFRepository implements Repository<PF, Long> {
                 while (rs.next()) {
                     String nome = rs.getString("NM_PESSOA");
                     LocalDate nascimento = rs.getDate("DT_NASCIMENTO").toLocalDate();
-                    String cpf = rs.getString("NR_CPF");
-                    pessoa = new PF(id, nome, nascimento, cpf);
+                    String cnpj = rs.getString("NR_CNPJ");
+                    pessoa = new PJ(id, nome, nascimento, cnpj);
                 }
             } else {
                 System.out.println("Dados não encontrados com o id: " + id);
@@ -83,11 +83,9 @@ public class PFRepository implements Repository<PF, Long> {
         return pessoa;
     }
 
-
     @Override
-    public PF persiste(PF pf) {
-
-        var sql = "BEGIN INSERT INTO TB_PF (NM_PESSOA , DT_NASCIMENTO, TP_PESSOA, NR_CPF) VALUES (?,?,?,?) returning ID_PESSOA into ?; END;";
+    public PJ persiste(PJ pj) {
+        var sql = "BEGIN INSERT INTO TB_PJ (NM_PESSOA , DT_NASCIMENTO, TP_PESSOA, NR_CNPJ) VALUES (?,?,?,?) returning ID_PESSOA into ?; END;";
 
         Connection con = factory.getConnection();
         CallableStatement cs = null;
@@ -95,23 +93,23 @@ public class PFRepository implements Repository<PF, Long> {
         try {
 
             cs = con.prepareCall(sql);
-            cs.setString(1, pf.getNome());
-            cs.setDate(2, Date.valueOf(pf.getNascimento()));
-            cs.setString(3, pf.getTipo());
-            cs.setString(4, pf.getCPF());
+            cs.setString(1, pj.getNome());
+            cs.setDate(2, Date.valueOf(pj.getNascimento()));
+            cs.setString(3, pj.getTipo());
+            cs.setString(4, pj.getCNPJ());
 
             cs.registerOutParameter(5, Types.BIGINT);
 
             cs.executeUpdate();
 
-            pf.setId(cs.getLong(5));
+            pj.setId(cs.getLong(5));
 
         } catch (SQLException e) {
             System.err.println("Não foi possível inserir os dados!\n" + e.getMessage());
         } finally {
             fecharObjetos(null, cs, con);
         }
-        return pf;
+        return pj;
     }
 
     private static void fecharObjetos(ResultSet rs, Statement st, Connection con) {
@@ -125,5 +123,4 @@ public class PFRepository implements Repository<PF, Long> {
             System.err.println("Erro ao encerrar o ResultSet, a Connection e o Statment!\n" + e.getMessage());
         }
     }
-
 }

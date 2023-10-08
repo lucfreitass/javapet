@@ -25,9 +25,9 @@ CREATE TABLE "TB_PF"
          ID_PESSOA
             )
         USING INDEX
-            (
-            CREATE UNIQUE INDEX IDX_TB_PF_PK ON TB_PF (ID_PESSOA ASC)
-            )
+        (
+        CREATE UNIQUE INDEX IDX_TB_PF_PK ON TB_PF (ID_PESSOA ASC)
+        )
 );
 /
 
@@ -43,9 +43,9 @@ CREATE TABLE "TB_PJ"
          ID_PESSOA
             )
         USING INDEX
-            (
-            CREATE UNIQUE INDEX IDX_TB_PJ_PK ON TB_PJ (ID_PESSOA ASC)
-            )
+        (
+        CREATE UNIQUE INDEX IDX_TB_PJ_PK ON TB_PJ (ID_PESSOA ASC)
+        )
 );
 /
 
@@ -63,9 +63,9 @@ CREATE TABLE TB_ANIMAL
          ID_ANIMAL
             )
         USING INDEX
-            (
-            CREATE UNIQUE INDEX IDX_TB_ANIMAL_PK ON TB_ANIMAL (ID_ANIMAL ASC)
-            )
+        (
+        CREATE UNIQUE INDEX IDX_TB_ANIMAL_PK ON TB_ANIMAL (ID_ANIMAL ASC)
+        )
 );
 /
 
@@ -82,53 +82,53 @@ CREATE TABLE TB_SERVICO
          ID_SERVICO
             )
         USING INDEX
-            (
-            CREATE UNIQUE INDEX IDX_TB_SERVICO_PK ON TB_SERVICO (ID_SERVICO ASC)
-            )
+        (
+        CREATE UNIQUE INDEX IDX_TB_SERVICO_PK ON TB_SERVICO (ID_SERVICO ASC)
+        )
 );
 /
 
 
 create or replace trigger TG_SQ_SERVICOS
     before insert or update
-    on TB_SERVICO
-    for each row
+                                on TB_SERVICO
+                                for each row
 begin
     if inserting and :new.ID_SERVICO is null or :new.ID_SERVICO < 1 then
         :new.ID_SERVICO := SQ_SERVICOS.nextval;
-    end if;
+end if;
 end;
 /
 
 create or replace trigger TG_SQ_ANIMAIS
     before insert or update
-    on TB_ANIMAL
-    for each row
+                                on TB_ANIMAL
+                                for each row
 begin
     if inserting and :new.ID_ANIMAL is null or :new.ID_ANIMAL < 1 then
         :new.ID_ANIMAL := SQ_ANIMAIS.nextval;
-    end if;
+end if;
 end;
 /
 
 create or replace trigger TG_SQ_PF
     before insert or update
-    on TB_PF
-    for each row
+                                on TB_PF
+                                for each row
 begin
     if inserting and :new.ID_PESSOA is null or :new.ID_PESSOA < 1 then
         :new.ID_PESSOA := SQ_PESSOAS.nextval;
-    end if;
+end if;
 end;
 /
 create or replace trigger TG_SQ_PJ
     before insert or update
-    on TB_PJ
-    for each row
+                                on TB_PJ
+                                for each row
 begin
     if inserting and :new.ID_PESSOA is null or :new.ID_PESSOA < 1 then
         :new.ID_PESSOA := SQ_PESSOAS.nextval;
-    end if;
+end if;
 end;
 /
 
@@ -147,19 +147,19 @@ ALTER TABLE TB_ANIMAL
     ADD CONSTRAINT TB_ANIMAL_FK_DONO_PF
         FOREIGN KEY (ID_ANIMAL)
             REFERENCES TB_PF (ID_PESSOA)
-                ENABLE;
+    ENABLE;
 /
 
 ALTER TABLE TB_ANIMAL
     ADD CONSTRAINT TB_ANIMAL_FK_DONO_PJ
         FOREIGN KEY (ID_ANIMAL)
             REFERENCES TB_PJ (ID_PESSOA)
-                ENABLE;
+    ENABLE;
 /
 
 ALTER TABLE TB_SERVICO
     ADD CONSTRAINT TB_SERVICO_FK_ANIMAL
         FOREIGN KEY (ID_SERVICO)
             REFERENCES TB_ANIMAL (ID_ANIMAL)
-                ENABLE;
+    ENABLE;
 /
